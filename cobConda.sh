@@ -25,7 +25,7 @@ export PATH=$BASE/.local/bin:$PATH
 #===================================================
 #----------------Install conda ---------------------
 #===================================================
-if ! hash foo 2>/dev/null ; then
+if ! hash conda 2>/dev/null ; then
 	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
 	bash miniconda.sh -b $HOME/miniconda
 	export PATH="$HOME/miniconda/bin:$PATH"
