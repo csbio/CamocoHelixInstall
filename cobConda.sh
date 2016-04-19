@@ -5,7 +5,7 @@
 # Updated January 20, 2015
 
 # Configurable variables
-export NAME="camoco"
+export NAME="cobBox"
 [ -z "$BASE" ] && { echo "Need to set the BASE env variable as the base camoco install dir"; exit 1; }
 [ -z "$GH_USER" ] && { echo "Need to set GH_USER env variable"; exit 1; }
 
@@ -27,8 +27,9 @@ export PATH=$BASE/.local/bin:$PATH
 #===================================================
 if ! hash conda 2>/dev/null ; then
 	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-	bash miniconda.sh -b -f -p $BASE/.local
+	bash miniconda.sh -b -f -p $BASE/.local/conda
 	rm -rf miniconda.sh
+	export PATH=/heap/jeffe174/.local/conda/bin:$PATH
 fi
 
 
@@ -123,7 +124,7 @@ echo "Making the conda virtual environment named $NAME in $BASE/.conda"
 cd $BASE
 conda config --add envs_dirs $BASE/.conda
 conda remove -y --name $NAME --all
-conda create -y -n $NAME --no-update-deps python=3.4 anaconda setuptools pip distribute cython==0.22.1 nose six pyyaml yaml pyparsing python-dateutil pytz numpy scipy pandas matplotlib==1.4.3 numexpr patsy statsmodels pytables flask networkx ipython mpmath
+conda create -y -n $NAME python=3.4 anaconda setuptools pip distribute cython==0.22.1 nose six pyyaml yaml pyparsing python-dateutil pytz numpy scipy pandas matplotlib==1.4.3 numexpr patsy statsmodels pytables flask networkx ipython mpmath pytest
 conda install --no-update-deps -y -n $NAME -c http://conda.anaconda.org/omnia termcolor
 conda install --no-update-deps -y -n $NAME -c http://conda.anaconda.org/cpcloud ipdb
 source activate $NAME
@@ -149,9 +150,31 @@ rm -rf apsw
 #===================================================
 #------------Update the bashrc----------------------
 #===================================================
-echo "Update your $HOME/.bashrc:"
-echo "export LD_LIBRARY_PATH=$BASE/.local/lib:\$LD_LIBRARY_PATH" >> $HOME/.bashrc
-echo "export PATH=$BASE/.local/bin:\$PATH" >> $HOME/.bashrc
+echo "Update your $HOME/.bashrc if needed:"
+
+# Add the main local bin folder
+if ! grep -q "PATH=$BASE/.local/bin" $HOME/.bashrc
+then
+    echo "export PATH=$BASE/.local/bin:\$PATH" >> $HOME/.bashrc
+fi
+
+# Add the conda bin folder
+if ! grep -q "PATH=$BASE/.local/conda/bin" $HOME/.bashrc
+then
+    echo "export PATH=$BASE/.local/conda/bin:\$PATH" >> $HOME/.bashrc
+fi
+
+# Add Camoco to your python path
+if ! grep -q "$BASE/Camoco" $HOME/.bashrc
+then
+    echo "export PYTHONPATH=\$PYTHONPATH:$BASE/Camoco" >> $HOME/.bashrc
+fi
+
+# Add the local library to your lib path
+if ! grep -q "LD_LIBRARY_PATH=$BASE/.local/lib" $HOME/.bashrc
+then
+    echo "export LD_LIBRARY_PATH=$BASE/.local/lib:\$LD_LIBRARY_PATH" >> $HOME/.bashrc
+fi
 
 #===================================================
 #-------------Use Instructions----------------------
